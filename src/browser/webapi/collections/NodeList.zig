@@ -24,7 +24,6 @@ const js = @import("../../js/js.zig");
 const Page = @import("../../Page.zig");
 const Session = @import("../../Session.zig");
 const Node = @import("../Node.zig");
-const Execution = js.Execution;
 
 const ChildNodes = @import("ChildNodes.zig");
 const RadioNodeList = @import("RadioNodeList.zig");
@@ -79,28 +78,28 @@ pub fn getAtIndex(self: *NodeList, index: usize, page: *Page) !?*Node {
     };
 }
 
-pub fn keys(self: *NodeList, exec: *const Execution) !*KeyIterator {
-    return .init(.{ .list = self }, exec);
+pub fn keys(self: *NodeList, page: *Page) !*KeyIterator {
+    return .init(.{ .list = self }, page);
 }
 
-pub fn values(self: *NodeList, exec: *const Execution) !*ValueIterator {
-    return .init(.{ .list = self }, exec);
+pub fn values(self: *NodeList, page: *Page) !*ValueIterator {
+    return .init(.{ .list = self }, page);
 }
 
-pub fn entries(self: *NodeList, exec: *const Execution) !*EntryIterator {
-    return .init(.{ .list = self }, exec);
+pub fn entries(self: *NodeList, page: *Page) !*EntryIterator {
+    return .init(.{ .list = self }, page);
 }
 
-pub fn forEach(self: *NodeList, cb: js.Function, exec: *const Execution) !void {
+pub fn forEach(self: *NodeList, cb: js.Function, page: *Page) !void {
     var i: i32 = 0;
 
-    var it = try self.values(exec);
+    var it = try self.values(page);
 
     // the iterator takes a reference against our list
-    defer self.releaseRef(exec.context.page._session);
+    defer self.releaseRef(page._session);
 
     while (true) : (i += 1) {
-        const next = try it.next(exec);
+        const next = try it.next(page);
         if (next.done) {
             return;
         }
@@ -136,9 +135,9 @@ const Iterator = struct {
         self.list.acquireRef();
     }
 
-    pub fn next(self: *Iterator, exec: *const Execution) !?Entry {
+    pub fn next(self: *Iterator, page: *Page) !?Entry {
         const index = self.index;
-        const node = try self.list.getAtIndex(index, exec.context.page) orelse return null;
+        const node = try self.list.getAtIndex(index, page) orelse return null;
         self.index = index + 1;
         return .{ index, node };
     }
