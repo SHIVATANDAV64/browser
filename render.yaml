@@ -1,0 +1,13 @@
+services:
+  - type: web
+    name: lightpanda-cdp
+    env: docker
+    plan: free
+    dockerfilePath: ./deploy/render/Dockerfile
+    healthCheckPath: /json/version
+    autoDeploy: true
+    envVars:
+      - key: LIGHTPANDA_DISABLE_TELEMETRY
+        value: "true"
+      - key: LIGHTPANDA_LOG_LEVEL
+        value: info
